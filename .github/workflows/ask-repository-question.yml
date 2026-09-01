@@ -1,0 +1,36 @@
+name: Ask a repository question
+
+on:
+  workflow_dispatch:
+    inputs:
+      title:
+        description: Discussion title
+        required: true
+        type: string
+      body:
+        description: Discussion question
+        required: true
+        type: string
+
+permissions:
+  discussions: write
+
+jobs:
+  ask:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create a Q&A discussion as GitHub Actions
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY_ID: R_kgDOULBbMQ
+          CATEGORY_ID: DIC_kwDOULBbMc4DEqSy
+          DISCUSSION_TITLE: ${{ inputs.title }}
+          DISCUSSION_BODY: ${{ inputs.body }}
+        shell: bash
+        run: |
+          gh api graphql \
+            -f query='mutation($repositoryId: ID!, $categoryId: ID!, $title: String!, $body: String!) { createDiscussion(input: {repositoryId: $repositoryId, categoryId: $categoryId, title: $title, body: $body}) { discussion { id url } } }' \
+            -f repositoryId="$REPOSITORY_ID" \
+            -f categoryId="$CATEGORY_ID" \
+            -f title="$DISCUSSION_TITLE" \
+            -f body="$DISCUSSION_BODY"
