@@ -1,0 +1,152 @@
+[
+  {
+    "title": "Why are collaboration record numbers zero-padded?",
+    "question": "Record filenames use identifiers such as 003 instead of 3. What practical benefit does zero-padding provide?",
+    "answer": "Zero-padding makes ordinary lexical sorting match numeric order. File browsers, command output, and repository diffs therefore show records in a predictable sequence without requiring custom sorting logic."
+  },
+  {
+    "title": "Why does the workflow use workflow_dispatch?",
+    "question": "The collaboration workflow is manually dispatched rather than scheduled. Why is that safer for this repository?",
+    "answer": "Manual dispatch makes each batch intentional and bounded. The operator supplies an explicit range, can inspect account health between batches, and avoids an unattended schedule creating unexpected public activity."
+  },
+  {
+    "title": "Why are start and end inputs explicit?",
+    "question": "What reliability benefit comes from requiring both a start and end number for each batch?",
+    "answer": "An explicit closed range makes the requested scope reviewable before execution. It also supports small staged batches, deterministic retries, and a clear stop point if GitHub reports an error or rate limit."
+  },
+  {
+    "title": "Why does the workflow use least-privilege permissions?",
+    "question": "The branch workflow grants contents write but no unrelated permissions. Why is that important?",
+    "answer": "Least privilege limits the impact of a workflow defect or compromised dependency. The job can create the intended branch commits, but it cannot modify issues, packages, deployments, or other repository resources it does not need."
+  },
+  {
+    "title": "Why are bot and owner authorship both visible?",
+    "question": "What does showing github-actions as author and the repository owner as co-author communicate?",
+    "answer": "It separates execution from intent. GitHub Actions performed the automated file change, while the linked co-author trailer records the owner's participation and approval without misrepresenting the bot as a human."
+  },
+  {
+    "title": "Why use merge commits for attributed pull requests?",
+    "question": "Why were these pull requests merged with merge commits instead of squash or rebase?",
+    "answer": "A merge commit preserves the original bot-authored commit and its Co-authored-by trailer unchanged. Squash or rebase can rewrite commit messages and accidentally remove the attribution GitHub needs to link authors."
+  },
+  {
+    "title": "Why does each record change a unique file?",
+    "question": "What conflict-avoidance property comes from writing one new file for every collaboration record?",
+    "answer": "Branches that add different paths do not compete for the same lines. They can be created from one base commit and merged sequentially with a much lower risk of conflicts than repeated edits to one shared file."
+  },
+  {
+    "title": "Why delete merged topic branches?",
+    "question": "Why does the merge process remove each remote topic branch after the pull request is merged?",
+    "answer": "The merged pull request and commit remain permanent evidence, so the temporary branch no longer adds value. Removing it keeps branch lists readable and reduces the chance of accidentally reusing stale work."
+  },
+  {
+    "title": "Why keep the practice repositories public?",
+    "question": "What transparency benefit comes from using dedicated public repositories for these exercises?",
+    "answer": "Public repositories let anyone inspect the workflow, commits, authorship, issues, and pull requests used for verification. Dedicated repositories also isolate the exercises from production code and customer data."
+  },
+  {
+    "title": "Why avoid using existing production repositories?",
+    "question": "Why were the achievement exercises not added to the owner's active application repositories?",
+    "answer": "Achievement-oriented records are unrelated to application behavior and would add noise to real release history. Isolating them prevents accidental deployments, review burden, and confusion for future maintainers."
+  },
+  {
+    "title": "Why verify authors through the GitHub API?",
+    "question": "What does API verification add beyond trusting the text of a local commit message?",
+    "answer": "The API shows whether GitHub resolved each email to an actual account login. That distinguishes linked co-authorship from an unverified trailer that merely looks correct in raw commit text."
+  },
+  {
+    "title": "Why verify public merged pull request totals separately?",
+    "question": "Why not rely only on local branch counts when checking progress?",
+    "answer": "Achievements are evaluated from server-side events, not local branches. A public merged-PR search confirms that GitHub recorded completed merges under the intended account and excludes abandoned or unpushed work."
+  },
+  {
+    "title": "Why are profile badges treated as eventually consistent?",
+    "question": "Why can a qualifying event exist before its badge appears on the public profile?",
+    "answer": "GitHub processes achievement events asynchronously and may cache profile fragments. The repository events are the immediate source of truth, while badge visibility can update later without any further repository change."
+  },
+  {
+    "title": "Why stop on a secondary rate limit?",
+    "question": "What is the correct response if GitHub returns an abuse warning or secondary rate-limit response?",
+    "answer": "Automation should stop immediately rather than retry aggressively. Backing off protects the account and platform, preserves a clear failure boundary, and allows the next batch to resume only after GitHub permits it."
+  },
+  {
+    "title": "Why use staged batches instead of one huge run?",
+    "question": "What operational advantages come from running bounded batches and verifying between them?",
+    "answer": "Staging limits the blast radius of mistakes, exposes permission or attribution problems early, and creates natural checkpoints for event counts, rate limits, workflow status, and profile processing."
+  },
+  {
+    "title": "Why make the discussion category answerable?",
+    "question": "Why must repository questions be created in the Q&A category rather than General?",
+    "answer": "Only an answerable discussion category supports marking a comment as the accepted answer. General discussions can hold comments, but they do not expose the answer state required for a verified Q&A resolution."
+  },
+  {
+    "title": "Why ask questions through repository automation?",
+    "question": "What makes an automation-authored question appropriate for this repository?",
+    "answer": "The questions concern the automation's actual design and operation, so the automation is a truthful originator. The owner's answer documents the human rationale and creates reusable maintenance guidance."
+  },
+  {
+    "title": "Why keep Q&A answers concise and specific?",
+    "question": "How does a focused answer improve the long-term value of repository Discussions?",
+    "answer": "A concise answer resolves one concrete design question, is easier to verify against the workflow, and remains useful to future readers without burying the decision in unrelated background."
+  },
+  {
+    "title": "Why should question creation be idempotent?",
+    "question": "Why should a batch workflow check for an existing title before creating a discussion?",
+    "answer": "Idempotency makes retries safe. If a run is interrupted after partial success, checking existing titles prevents duplicate public questions while allowing the unfinished portion to continue."
+  },
+  {
+    "title": "Why keep a permanent issue lifecycle example?",
+    "question": "What value does the closed issue provide after the Quickdraw timing condition has been met?",
+    "answer": "The issue preserves timestamps, comments, reactions, and closure state in one auditable record. It demonstrates the normal issue lifecycle and lets later verification rely on public server timestamps."
+  },
+  {
+    "title": "Why use server timestamps for timing checks?",
+    "question": "Why are GitHub's created_at and closed_at values preferred over a local stopwatch?",
+    "answer": "Server timestamps are authoritative, durable, and independently queryable. They avoid uncertainty from local clock drift or delayed command output and prove the interval after the fact."
+  },
+  {
+    "title": "Why avoid artificial stars?",
+    "question": "Why can automation not legitimately substitute for the users required by Starstruck?",
+    "answer": "A star expresses another user's interest in a repository. Creating fake accounts or coordinated artificial stars would misrepresent real community interest, so Starstruck must wait for genuine third-party engagement."
+  },
+  {
+    "title": "Why is sponsorship handled separately?",
+    "question": "Why is the Public Sponsor achievement not included in automatic repository operations?",
+    "answer": "Sponsorship moves real money and requires the user to choose a recipient, amount, cadence, and payment method. Those decisions need explicit transaction approval and cannot be inferred from a request to edit a repository."
+  },
+  {
+    "title": "Why are retired achievements excluded?",
+    "question": "Why cannot current repository activity earn Arctic Code Vault or Mars 2020 achievements?",
+    "answer": "Those achievements were tied to historical snapshots and mission repositories with closed eligibility windows. New events cannot be backdated into those programs, so current automation cannot satisfy them."
+  },
+  {
+    "title": "Why stop Pull Shark automation at Silver?",
+    "question": "Why is the 128-merge Silver threshold a safer stopping point than generating 1024 merges for Gold?",
+    "answer": "Moving from 128 to 1024 would add 896 low-value pull requests, substantially increasing account and platform risk without improving the repository. Silver demonstrates the workflow at scale while keeping a firm proportionality limit."
+  },
+  {
+    "title": "Why retain the workflow source after the exercise?",
+    "question": "What maintenance value remains in the workflow files once the initial achievement events are complete?",
+    "answer": "The source explains exactly how branches, attribution, and discussions were produced. Keeping it supports reproducibility, later audits, and targeted fixes if GitHub changes an API or runner behavior."
+  },
+  {
+    "title": "Why record workflow run URLs?",
+    "question": "What does a successful Actions run URL prove that a merged pull request alone does not?",
+    "answer": "The run shows which workflow version executed, when it ran, which job performed the operation, and whether every step completed. It complements the pull request by proving the automation path itself."
+  },
+  {
+    "title": "Why monitor dependency deprecation warnings?",
+    "question": "Why should a successful workflow still track warnings such as an old Node runtime in an action?",
+    "answer": "Warnings identify future failure risk before it becomes an outage. Tracking them allows maintainers to upgrade the affected action deliberately while today's successful evidence is still available for comparison."
+  },
+  {
+    "title": "Why keep generated content plain Markdown?",
+    "question": "What benefits does simple Markdown provide for collaboration and audit records?",
+    "answer": "Markdown is human-readable in diffs, renders natively on GitHub, needs no build tool, and remains portable. That keeps each record easy to inspect and avoids introducing executable content."
+  },
+  {
+    "title": "Why separate qualifying events from badge verification?",
+    "question": "Why does the final report distinguish completed GitHub events from profile badge visibility?",
+    "answer": "Event APIs provide immediate objective evidence, while badge pages can lag or depend on profile visibility settings. Reporting them separately prevents a processing delay from being mistaken for a failed contribution."
+  }
+]
