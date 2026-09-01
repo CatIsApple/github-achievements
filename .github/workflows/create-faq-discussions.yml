@@ -1,0 +1,38 @@
+name: Create repository FAQ discussions
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  discussions: write
+
+jobs:
+  create-faq:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create missing Q&A discussions
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY_ID: R_kgDOULBbMQ
+          CATEGORY_ID: DIC_kwDOULBbMc4DEqSy
+        shell: bash
+        run: |
+          jq -c '.[]' faq/questions.json | while read -r item; do
+            title=$(jq -r '.title' <<<"$item")
+            body=$(jq -r '.question' <<<"$item")
+            exists=$(gh api graphql \
+              -f query='query { repository(owner: "CatIsApple", name: "github-achievements") { discussions(first: 100) { nodes { title } } } }' \
+              | jq --arg title "$title" '[.data.repository.discussions.nodes[] | select(.title == $title)] | length')
+            if [[ "$exists" != "0" ]]; then
+              continue
+            fi
+            gh api graphql \
+              -f query='mutation($repositoryId: ID!, $categoryId: ID!, $title: String!, $body: String!) { createDiscussion(input: {repositoryId: $repositoryId, categoryId: $categoryId, title: $title, body: $body}) { discussion { id url } } }' \
+              -f repositoryId="$REPOSITORY_ID" \
+              -f categoryId="$CATEGORY_ID" \
+              -f title="$title" \
+              -f body="$body"
+          done
